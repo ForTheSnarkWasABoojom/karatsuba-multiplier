@@ -121,3 +121,11 @@ make run_test
 ```
 make run_test
 ```
+Для тестирования конкретной размерности N необходимо выполнить следующие команды:
+
+```
+make run ARGS="{N}"
+make build_testbench ARGS="{N}"
+iverilog -o output/test.vvp output/karatsuba_multiplier_{N}.v output/tb_karatsuba_multiplier_{N}.v
+vvp output/test.vvp
+```

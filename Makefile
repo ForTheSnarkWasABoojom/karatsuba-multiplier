@@ -21,7 +21,7 @@ build: $(MAIN_SRC)
 	mkdir -p $(OUTPUT_DIR)
 	$(CXX) $(CXXFLAGS) -o $(MAIN_EXEC) $(MAIN_SRC)
 
-# Запуск основного кода
+# Создание основного кода
 run: build
 	./$(MAIN_EXEC) $(ARGS)
 
@@ -33,6 +33,10 @@ build_test: $(TEST_SRC)
 # Запуск тестов
 run_test: build_test
 	./$(TEST_EXEC)
+
+# Создание тестбенча
+build_testbench: build
+	./$(MAIN_EXEC) -test $(ARGS)
 
 # Выполнение всех шагов последовательно
 all: build build_test run_test

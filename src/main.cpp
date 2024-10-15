@@ -5,7 +5,8 @@
 #include "generator/verilog_generator.h"
 
 using namespace std;
-const string DEFAULT_OUTPUT_FILENAME = "output/karatsuba_multiplier.v"; // Имя файла по умолчанию
+const string DEFAULT_MULTIPLIER_FILENAME = "output/karatsuba_multiplier_"; // Основа файла для модуля по умолчанию
+const string DEFAULT_TESTBENCH_FILENAME = "output/tb_karatsuba_multiplier_"; // Основа файла для тестбенча по умолчанию
 
 // Функция для печатания ошибки
 void printError(const string& message) {
@@ -52,8 +53,8 @@ bool isValidNumber(const string& str, int& number) {
 }
 
 int main(int argc, char* argv[]) {
-    string output_filename = DEFAULT_OUTPUT_FILENAME; 
-    string number_str;
+    string output_filename, number_str, generated_text;
+    bool create_test = false;  // Флаг создания тестбенча
     int n;
 
     // Обрабатываем аргументы командной строки
@@ -67,6 +68,8 @@ int main(int argc, char* argv[]) {
                 printError("Необходимо передать имя файла после аргумента -output.");
                 return 1;
             }
+        }  else if (arg == "-test") {
+            create_test = true; 
         } else {
             number_str = arg; // Считаем, что это число
         }
@@ -88,6 +91,18 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    // Если флаг true - создаем тестбенч, иначе - модуль
+    if (create_test) {
+        if (output_filename == "") {
+            output_filename = DEFAULT_TESTBENCH_FILENAME+number_str+".v";
+        }
+        generated_text = generateTestbench(n);
+    } else {
+        if (output_filename == "") {
+            output_filename = DEFAULT_MULTIPLIER_FILENAME+number_str+".v";
+        }
+        generated_text = generateVerilogModule(n);
+    }
     // Проверяем и создаем папку "output"
     filesystem::create_directories("output");
 
@@ -98,8 +113,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    // Генерация модуля
-    output_file << generateVerilogModule(n);
+    output_file << generated_text;
     output_file.close();
     
     cout << "Программа успешно сгенерирована в файле: " << output_filename << endl;
